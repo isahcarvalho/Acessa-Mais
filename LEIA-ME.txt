@@ -1,0 +1,90 @@
+ACESSA+ — COMEÇANDO DO ZERO
+===========================
+
+O QUE VEM NESTA PASTA
+- index.html: estrutura das telas.
+- style.css: aparência e adaptação para celular.
+- script.js: busca, detalhes, sugestões, relatos e painel da equipe.
+- supabase-config.js: conexão do site com o Supabase (você preencherá dois valores).
+- database.sql: tabelas, regras de segurança e cadastro inicial dos locais.
+
+COMO O PROJETO FUNCIONA
+- GitHub Pages hospeda o site e fornece o link público.
+- Supabase guarda os dados compartilhados e autentica a equipe.
+- Qualquer visitante pode consultar locais, enviar sugestão e relatar barreiras.
+- Sugestões não alteram os dados automaticamente.
+- Só contas promovidas a administradoras podem entrar no painel, revisar sugestões, atualizar recursos e alterar o status dos relatos.
+- Os recursos começam como “Não informado”. Isso não quer dizer que o lugar não tenha o recurso.
+
+PARTE 1 — CRIAR O PROJETO NO SUPABASE
+1. Com ajuda de um adulto responsável pela equipe, acesse https://supabase.com/ e crie uma conta/projeto.
+2. Crie um projeto chamado Acessa Mais. Guarde a senha do banco em local seguro; não coloque essa senha no GitHub.
+3. Quando o projeto terminar de iniciar, abra o SQL Editor no painel do Supabase.
+4. Abra o arquivo database.sql desta pasta, copie todo o conteúdo, cole no SQL Editor e execute (Run).
+5. Se aparecer erro, pare e confira a mensagem antes de continuar. Não publique o site até as tabelas e políticas terem sido criadas corretamente.
+
+PARTE 2 — CRIAR A CONTA DA EQUIPE
+1. No Supabase, abra Authentication > Users.
+2. Use a opção para adicionar/criar um usuário com o e-mail oficial da equipe e uma senha forte. Não compartilhe essa senha com visitantes.
+3. Depois de criar o usuário, abra o SQL Editor e execute o comando abaixo, substituindo o e-mail pelo e-mail exato cadastrado:
+
+update public.profiles p
+set role = 'admin'
+from auth.users u
+where p.id = u.id
+  and lower(u.email) = lower('COLOQUE_AQUI_O_EMAIL_DA_EQUIPE');
+
+4. Confira se uma linha foi atualizada. Se nenhuma linha foi atualizada, confira se o usuário foi criado e se o e-mail está correto.
+5. Não habilite cadastro público de administradores. A conta da equipe deve ser criada e promovida manualmente por alguém responsável.
+
+PARTE 3 — CONECTAR O SITE AO SUPABASE
+1. No Supabase, abra Project Settings > API (ou a área de API Keys/Connect do projeto).
+2. Copie a Project URL.
+3. Copie a chave publicável (Publishable key; em projetos antigos pode aparecer como anon/public key).
+4. Abra supabase-config.js.
+5. Substitua COLE_AQUI_A_URL_DO_PROJETO pela URL e COLE_AQUI_A_CHAVE_PUBLICAVEL pela chave publicável.
+6. Salve o arquivo.
+
+IMPORTANTE SOBRE CHAVES
+- A URL e a chave publicável/anon são destinadas ao uso no navegador, mas só são seguras neste projeto porque as tabelas têm RLS e políticas restritivas.
+- NUNCA copie para o site ou para o GitHub a chave secret, service_role, senha do banco ou token privado.
+- Nunca peça que usuários enviem senhas pelo formulário público.
+
+PARTE 4 — PUBLICAR NO GITHUB
+1. Abra o repositório do Acessa+ no GitHub.
+2. Faça backup dos arquivos atuais antes de substituir qualquer coisa.
+3. Na página principal do repositório, envie os cinco arquivos desta pasta para a raiz (Add file > Upload files). Se o GitHub perguntar se deseja substituir arquivos com o mesmo nome, confira se está no repositório correto e confirme.
+4. Confirme que index.html, style.css, script.js, supabase-config.js e database.sql estão na raiz do repositório.
+5. Abra Settings > Pages.
+6. Em Build and deployment, escolha Deploy from a branch; selecione a branch main e a pasta /(root), depois Save.
+7. Aguarde a publicação e abra o endereço mostrado na seção Pages.
+
+PARTE 5 — TESTAR ANTES DE DIVULGAR
+1. Abra o link do site em uma janela anônima: os locais devem aparecer sem login.
+2. Abra um local: os recursos devem aparecer com as quatro cores/legendas.
+3. Envie uma sugestão de teste e um relato de teste.
+4. Entre em Área da equipe com o e-mail e senha da conta administradora.
+5. Na aba Sugestões, aprove ou rejeite a sugestão de teste. Ao aprovar, a informação do local deve mudar para todos os visitantes.
+6. Na aba Relatos, altere o status de um relato de teste.
+7. Apague os registros de teste pelo painel do Supabase, se não quiser mantê-los.
+
+COMO USAR AS CORES
+- Verde — Confirmado.
+- Vermelho — Não disponível (só usar depois de verificar que o recurso realmente não existe/não está disponível).
+- Cinza — Não informado.
+- Laranja — Em verificação.
+
+CUIDADOS IMPORTANTES
+- Não invente dados de acessibilidade. Registre fonte e data de verificação em um controle interno da equipe antes de aprovar sugestões.
+- Endereços e telefones do cadastro inicial devem ser conferidos antes da divulgação pública. Alguns registros foram incluídos como ponto de partida e estão identificados como a confirmar.
+- O formulário de relatos envia informações para a equipe Acessa+, mas não envia automaticamente à Prefeitura ou a serviços de emergência.
+- Não solicite dados sensíveis ou desnecessários nos formulários. Evite publicar nomes, telefones pessoais, rostos ou informações privadas em relatos.
+- GitHub Pages publica o site na internet. O repositório e o conteúdo do site devem ser tratados como públicos.
+- O painel é protegido por autenticação e regras RLS do banco. Não remova essas políticas para “fazer funcionar”.
+- O projeto é uma primeira versão funcional. Antes de uso amplo, teste com pessoas com diferentes necessidades de acessibilidade e revise os dados com fontes confiáveis.
+
+DOCUMENTAÇÃO OFICIAL
+- Supabase: https://supabase.com/docs
+- Supabase JavaScript: https://supabase.com/docs/reference/javascript/installing
+- Supabase Row Level Security: https://supabase.com/docs/guides/database/postgres/row-level-security
+- GitHub Pages: https://docs.github.com/en/pages

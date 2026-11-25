@@ -691,7 +691,7 @@ async function loadAdminTab(root) {
   }
 
   root.replaceChildren();
-
+if (table === 'alerts') renderAlertForm(root);
   if (!data?.length) {
     root.append(el('div','empty',
       table === 'alerts'
@@ -858,6 +858,56 @@ function alertAdminCard(item) {
 
   return card;
 }
+
+function renderAlertForm(root) {
+  const form = el('form','admin-item');
+  form.append(el('h3','','Cadastrar novo aviso'));
+
+  const title = el('input');
+  title.placeholder = 'Título do aviso';
+  title.required = true;
+
+  const category = el('select');
+  ['Obras','Manutenção','Novidade'].forEach(value => {
+    category.add(new Option(value,value));
+  });
+
+  const description = el('textarea');
+  description.placeholder = 'Descreva o aviso';
+  description.required = true;
+
+  const location = el('input');
+  location.placeholder = 'Local (opcional)';
+
+  const save = el('button','button button-primary','Publicar aviso');
+  save.type = 'submit';
+
+  form.append(title,category,description,location,save);
+
+  form.addEventListener('submit',async event => {
+    event.preventDefault();
+
+    const {error} = await db.from('alerts').insert({
+      title: title.value.trim(),
+      category: category.value,
+      description: description.value.trim(),
+      location: location.value.trim(),
+      published: true
+    });
+
+    if (error) {
+      toast('Não foi possível publicar o aviso.');
+      console.error(error);
+      return;
+    }
+
+    toast('Aviso publicado com sucesso!');
+    loadAdminTab($('#admin-list'));
+  });
+
+  root.prepend(form);
+}
+
 
 async function approveSuggestion(item) {
   const place = places.find(p => p.id === item.place_id);

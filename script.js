@@ -782,7 +782,7 @@ function init() {
       hideModal('place-modal'); hideModal('admin-modal'); hideModal('account-modal');
     }
   });
-}
+
 
   $('#search').addEventListener('input',renderPlaces);
   $('#category-filter').addEventListener('change',() => {
@@ -837,5 +837,5 @@ db.auth.onAuthStateChange((_event, session) => {
     }
   }, 0);
 });
-
+}
 document.addEventListener('DOMContentLoaded',init);

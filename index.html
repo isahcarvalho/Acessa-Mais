@@ -41,5 +41,33 @@
 <div id="place-modal" class="modal" hidden><div class="modal-backdrop" data-close="place"></div><section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" data-close="place" aria-label="Fechar">×</button><div id="place-detail"></div></section></div>
 <div id="admin-modal" class="modal" hidden><div class="modal-backdrop" data-close="admin"></div><section class="modal-panel admin-panel" role="dialog" aria-modal="true" aria-labelledby="admin-title"><button class="modal-close" data-close="admin" aria-label="Fechar">×</button><div id="admin-content"><span class="eyebrow blue">ACESSO RESTRITO</span><h2 id="admin-title">Área da equipe</h2><p>Entre com a conta autorizada pela administração do Acessa+.</p><form id="login-form" class="form-card compact"><label>E-mail<input id="login-email" type="email" autocomplete="username" required></label><label>Senha<input id="login-password" type="password" autocomplete="current-password" required></label><button class="button button-primary" type="submit">Entrar</button><p id="login-feedback" class="feedback" role="status"></p></form></div></section></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- CONTA DO USUÁRIO -->
+<div class="modal" id="account-modal" aria-hidden="true">
+  <div class="modal-panel">
+    <button class="modal-close" id="account-close" type="button">×</button>
+
+    <div id="account-content">
+      <h2>Minha conta</h2>
+
+      <form id="account-login-form">
+        <label for="account-email">E-mail</label>
+        <input id="account-email" type="email" required>
+
+        <label for="account-password">Senha</label>
+        <input id="account-password" type="password" required>
+
+        <button class="button button-primary" type="submit">
+          Entrar
+        </button>
+      </form>
+
+      <p id="account-feedback" class="feedback"></p>
+
+      <button class="button button-ghost" id="show-signup" type="button">
+        Criar minha conta
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

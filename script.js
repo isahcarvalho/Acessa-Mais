@@ -1014,7 +1014,7 @@ db.auth.onAuthStateChange((_event, session) => {
       }
 
       if (shortcut === 'avisos') {
-        alert('Em breve: avisos sobre obras, manutenção e novidades de acessibilidade.');
+  renderPublicAlerts();
       }
     });
   });

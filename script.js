@@ -116,6 +116,30 @@ function populateSelects() {
     .sort((a,b) => a.localeCompare(b, 'pt-BR'))
     .forEach(c => category.add(new Option(c, c)));
   category.value = current;
+  const chips = $('#category-chips');
+  if (chips) {
+    chips.replaceChildren();
+    const addChip = (label, value) => {
+      const button = el('button', 'category-chip' + (category.value === value ? ' active' : ''), label);
+      button.type = 'button';
+      button.dataset.category = value;
+      button.setAttribute('aria-pressed', String(category.value === value));
+      button.addEventListener('click', () => {
+        category.value = value;
+        chips.querySelectorAll('.category-chip').forEach(chip => {
+          const active = chip.dataset.category === value;
+          chip.classList.toggle('active', active);
+          chip.setAttribute('aria-pressed', String(active));
+        });
+        renderPlaces();
+      });
+      chips.append(button);
+    };
+    addChip('Todos', '');
+    [...new Set(places.map(p => p.category).filter(Boolean))]
+      .sort((a,b) => a.localeCompare(b, 'pt-BR'))
+      .forEach(c => addChip(c, c));
+  }
   const placeSelect = $('#suggest-place');
   placeSelect.replaceChildren(new Option('Selecione um local', ''));
   places.forEach(p => placeSelect.add(new Option(p.name, p.id)));
@@ -136,6 +160,25 @@ function renderPlaces() {
   if (!filtered.length) { root.append(el('div','empty','Nenhum local encontrado com essa busca.')); return; }
   filtered.forEach(place => {
     const card = el('article','place-card');
+    const photoWrap = el('div','place-photo');
+    const photoUrl = [place.photo_url, place.photo, place.image_url].find(value => typeof value === 'string' && /^https?:\/\//i.test(value));
+    if (photoUrl) {
+      const photo = el('img','place-photo-image');
+      photo.src = photoUrl;
+      photo.alt = `Fachada de ${place.name}`;
+      photo.loading = 'lazy';
+      photo.referrerPolicy = 'no-referrer';
+      photo.addEventListener('error', () => {
+        photo.remove();
+        photoWrap.classList.add('photo-placeholder');
+        photoWrap.append(el('span','photo-placeholder-icon','⌂'),el('span','photo-placeholder-text','Foto indisponível'));
+      }, {once:true});
+      photoWrap.append(photo);
+    } else {
+      photoWrap.classList.add('photo-placeholder');
+      photoWrap.append(el('span','photo-placeholder-icon','⌂'),el('span','photo-placeholder-text','Foto da fachada em breve'));
+    }
+    card.append(photoWrap);
     card.append(el('span','place-category',place.category || 'Local'));
     card.append(el('h3','',place.name));
     card.append(el('p','place-address',place.address || 'Endereço não informado'));
@@ -205,7 +248,7 @@ async function loadPlaces() {
     $('#places-grid').replaceChildren(el('div','empty','Não foi possível carregar os locais. Confira a configuração do Supabase e as políticas do banco.'));
     return;
   }
-  places = data || [];
+    places = data || [];
   populateSelects();
   renderPlaces();
 }
@@ -455,7 +498,7 @@ async function saveReview(event,placeId,existingReview) {
   if (!currentUser) { toast('Entre na sua conta para avaliar.'); return; }
   const rating = Number($('#review-rating').value);
   const comment = $('#review-comment').value.trim();
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) { toast('Escolha uma nota de 1 a 5 estrelas.'); return; }
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) { toast('Escolha uma nota de 1 a 5 estrelas.'); return; }
   const button = $('#review-form button[type="submit"]');
   button.disabled = true;
   const payload = {
@@ -656,7 +699,14 @@ function init() {
   });
 
   $('#search').addEventListener('input',renderPlaces);
-  $('#category-filter').addEventListener('change',renderPlaces);
+  $('#category-filter').addEventListener('change',() => {
+    $('#category-chips')?.querySelectorAll('.category-chip').forEach(chip => {
+      const active = chip.dataset.category === $('#category-filter').value;
+      chip.classList.toggle('active', active);
+      chip.setAttribute('aria-pressed', String(active));
+    });
+    renderPlaces();
+  });
   $('#voice-btn').addEventListener('click',toggleVoiceSearch);
   setupVoiceSearch();
   $('#suggestion-form').addEventListener('submit',submitSuggestion);

@@ -87,11 +87,12 @@ function showModal(id) {
   modal.hidden = false;
   document.body.style.overflow = 'hidden';
 }
+
 function hideModal(id) {
   const modal = $('#' + id);
   if (!modal) return;
   modal.hidden = true;
-  if (!$('.modal:not([hidden])')) document.body.style.overflow = '';
+  if (!$('.modal:not([hidden])')) document.body.style.overflow ='';
 }
 function mapsUrl(address) {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address + ', Maringá, Paraná');
@@ -805,6 +806,7 @@ function init() {
     return;
   }
   renderLogin();
+  loadPlaces();
 
   db.auth.getSession().then(async ({data,error}) => {
     if (error || !data.session) return;

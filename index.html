@@ -19,7 +19,6 @@
   </a>
   <div class="topbar-actions">
     <button id="account-open" class="account-open" type="button" aria-label="Entrar ou cadastrar">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.8 20c.7-3.5 3.2-5.3 7.2-5.3s6.5 1.8 7.2 5.3"></path></svg>
       <span>Entrar / Cadastrar</span>
     </button>
   </div>
@@ -36,11 +35,12 @@
     <div class="search-area">
       <div class="search-row">
         <div class="search-box">
-          <svg class="search-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
           <input id="search" type="search" placeholder="O que você está procurando?" aria-label="Buscar locais por nome, categoria ou endereço">
           <button id="voice-btn" class="voice-inside" type="button" aria-label="Pesquisar por voz" title="Pesquisar por voz">🎤</button>
         </div>
-        <select id="category-filter" class="visually-hidden" aria-label="Filtrar categoria"><option value="">Todas as categorias</option></select>
+        <select id="category-filter" class="visually-hidden" aria-label="Filtrar categoria">
+          <option value="">Todas as categorias</option>
+        </select>
       </div>
       <div class="category-area">
         <span class="category-caption">Explore por categoria</span>
@@ -50,13 +50,25 @@
       </div>
     </div>
     <div class="section-heading places-heading">
-      <div><span class="eyebrow blue">DESCUBRA MARINGÁ</span><h2 id="places-title">Locais para conhecer</h2><p>Veja fotos, endereços e informações de acessibilidade.</p></div>
+      <div>
+        <span class="eyebrow blue">DESCUBRA MARINGÁ</span>
+        <h2 id="places-title">Locais para conhecer</h2>
+        <p>Veja endereços e informações de acessibilidade.</p>
+      </div>
     </div>
-    <div id="places-grid" class="places-grid"><div class="loading">Carregando locais…</div></div>
+    <div id="places-grid" class="places-grid">
+      <div class="loading">Carregando locais…</div>
+    </div>
   </section>
 
   <section class="section soft-section" id="legenda">
-    <div class="section-heading"><div><span class="eyebrow blue">ENTENDA OS INDICADORES</span><h2>O que cada cor significa?</h2><p>As cores mostram o estado da informação, não uma nota geral do estabelecimento.</p></div></div>
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow blue">ENTENDA OS INDICADORES</span>
+        <h2>O que cada cor significa?</h2>
+        <p>As cores mostram o estado da informação, não uma nota geral do estabelecimento.</p>
+      </div>
+    </div>
     <div class="legend-grid">
       <div class="legend-item"><i class="dot green"></i><div><b>Confirmado</b><small>O recurso foi verificado e está disponível.</small></div></div>
       <div class="legend-item"><i class="dot red"></i><div><b>Não disponível</b><small>Foi verificado que o recurso não está disponível.</small></div></div>
@@ -64,78 +76,89 @@
       <div class="legend-item"><i class="dot orange"></i><div><b>Em verificação</b><small>A informação está sendo conferida.</small></div></div>
     </div>
   </section>
-    <div class="report-copy"><span class="eyebrow blue">CONSTRUA COM A GENTE</span><h2>Encontrou uma informação diferente?</h2><p>Envie uma sugestão de atualização. Ela será analisada pela equipe antes de aparecer para todos.</p><p class="small-note">Sugestões não alteram automaticamente os dados públicos.</p></div>
+
+  <section class="section report-section" id="contribuir">
+    <div class="report-copy">
+      <span class="eyebrow blue">CONSTRUA COM A GENTE</span>
+      <h2>Ajude a melhorar o Acessa+</h2>
+      <p>Envie sugestões para melhorar as informações e a acessibilidade dos locais.</p>
+      <p class="small-note">Todas as sugestões serão analisadas pela equipe antes de serem publicadas.</p>
+    </div>
+
     <form id="suggestion-form" class="form-card">
-      <label>Local<select id="suggest-place" required><option value="">Selecione um local</option></select></label>
-      <label>Recurso de acessibilidade<select id="suggest-feature" required></select></label>
-      <label>Informação sugerida<select id="suggest-status" required><option value="">Selecione</option><option>Confirmado</option><option>Não disponível</option><option>Em verificação</option><option>Não informado</option></select></label>
-      <label>Explique ou informe a fonte<textarea id="suggest-note" rows="3" minlength="8" maxlength="700" required placeholder="Conte como essa informação foi verificada ou inclua uma fonte pública."></textarea></label>
-      <label>Seu contato (opcional)<input id="suggest-contact" maxlength="120" placeholder="E-mail ou outro contato"></label>
-      <button class="button button-primary" type="submit">Enviar para análise</button><p id="suggest-feedback" class="feedback" role="status"></p>
+      <label>O que você deseja sugerir?
+        <select id="suggest-type" required>
+          <option value="">Selecione uma opção</option>
+          <option value="add_feature">Adicionar um recurso de acessibilidade</option>
+          <option value="correct_info">Corrigir uma informação do local</option>
+          <option value="update_contact">Atualizar endereço ou contato</option>
+          <option value="new_place">Sugerir um novo local</option>
+          <option value="other">Outra sugestão</option>
+        </select>
+      </label>
+
+      <label>Local
+        <select id="suggest-place">
+          <option value="">Selecione um local, se aplicável</option>
+        </select>
+      </label>
+
+      <label>Recurso de acessibilidade
+        <select id="suggest-feature">
+          <option value="">Selecione um recurso, se aplicável</option>
+        </select>
+      </label>
+
+      <label>Informação sugerida
+        <select id="suggest-status">
+          <option value="">Selecione, se aplicável</option>
+          <option>Confirmado</option>
+          <option>Não disponível</option>
+          <option>Em verificação</option>
+          <option>Não informado</option>
+        </select>
+      </label>
+
+      <label>Explique sua sugestão
+        <textarea id="suggest-note" rows="4" minlength="8" maxlength="700" required placeholder="Conte o que você gostaria de sugerir ou corrigir."></textarea>
+      </label>
+
+      <label>Seu contato (opcional)
+        <input id="suggest-contact" maxlength="120" placeholder="E-mail ou outro contato">
+      </label>
+
+      <button class="button button-primary" type="submit">Enviar para análise</button>
+      <p id="suggest-feedback" class="feedback" role="status"></p>
     </form>
   </section>
-<section class="section report-section" id="contribuir">
-  <div class="report-copy">
-    <span class="eyebrow blue">CONSTRUA COM A GENTE</span>
-    <h2>Ajude a melhorar o Acessa+</h2>
-    <p>Envie sugestões para melhorar as informações e a acessibilidade dos locais.</p>
-    <p class="small-note">Todas as sugestões serão analisadas pela equipe antes de serem publicadas.</p>
-  </div>
 
-  <form id="suggestion-form" class="form-card">
-    <label>O que você deseja sugerir?
-      <select id="suggest-type" required>
-        <option value="">Selecione uma opção</option>
-        <option value="add_feature">Adicionar um recurso de acessibilidade</option>
-        <option value="correct_info">Corrigir uma informação do local</option>
-        <option value="update_contact">Atualizar endereço ou contato</option>
-        <option value="new_place">Sugerir um novo local</option>
-        <option value="other">Outra sugestão</option>
-      </select>
-    </label>
-
-    <label id="suggest-place-label">Local
-      <select id="suggest-place">
-        <option value="">Selecione um local, se aplicável</option>
-      </select>
-    </label>
-
-    <label id="suggest-feature-label">Recurso de acessibilidade
-      <select id="suggest-feature">
-        <option value="">Selecione um recurso, se aplicável</option>
-      </select>
-    </label>
-
-    <label id="suggest-status-label">Informação sugerida
-      <select id="suggest-status">
-        <option value="">Selecione, se aplicável</option>
-        <option>Confirmado</option>
-        <option>Não disponível</option>
-        <option>Em verificação</option>
-        <option>Não informado</option>
-      </select>
-    </label>
-
-    <label>Explique sua sugestão
-      <textarea id="suggest-note" rows="4" minlength="8" maxlength="700"
-        required placeholder="Conte o que você gostaria de sugerir ou corrigir."></textarea>
-    </label>
-
-    <label>Seu contato (opcional)
-      <input id="suggest-contact" maxlength="120" placeholder="E-mail ou outro contato">
-    </label>
-
-    <button class="button button-primary" type="submit">Enviar para análise</button>
-    <p id="suggest-feedback" class="feedback" role="status"></p>
-  </form>
-</section>
   <section class="section report-section issue-section">
-    <div class="report-copy"><span class="eyebrow blue">MELHORIA DA CIDADE</span><h2>Relate uma barreira de acessibilidade</h2><p>Avise sobre calçada danificada, rampa bloqueada, elevador fora de serviço ou outro obstáculo.</p></div>
+    <div class="report-copy">
+      <span class="eyebrow blue">MELHORIA DA CIDADE</span>
+      <h2>Relate uma barreira de acessibilidade</h2>
+      <p>Avise sobre calçada danificada, rampa bloqueada, elevador fora de serviço ou outro obstáculo.</p>
+    </div>
     <form id="report-form" class="form-card">
-      <label>Tipo de problema<select id="report-type" required><option value="">Selecione</option><option>Calçada danificada</option><option>Rampa bloqueada</option><option>Elevador fora de serviço</option><option>Sinalização acessível com problema</option><option>Ponto de ônibus inacessível</option><option>Obra ou bloqueio</option><option>Outro</option></select></label>
-      <label>Localização<input id="report-location" required minlength="5" maxlength="180" placeholder="Rua, número, bairro ou ponto de referência"></label>
-      <label>Descrição<textarea id="report-description" required minlength="10" maxlength="700" rows="3" placeholder="Descreva o que precisa ser observado."></textarea></label>
-      <button class="button button-primary" type="submit">Enviar relato</button><p id="report-feedback" class="feedback" role="status"></p>
+      <label>Tipo de problema
+        <select id="report-type" required>
+          <option value="">Selecione</option>
+          <option>Calçada danificada</option>
+          <option>Rampa bloqueada</option>
+          <option>Elevador fora de serviço</option>
+          <option>Sinalização acessível com problema</option>
+          <option>Ponto de ônibus inacessível</option>
+          <option>Obra ou bloqueio</option>
+          <option>Outro</option>
+        </select>
+      </label>
+      <label>Localização
+        <input id="report-location" required minlength="5" maxlength="180" placeholder="Rua, número, bairro ou ponto de referência">
+      </label>
+      <label>Descrição
+        <textarea id="report-description" required minlength="10" maxlength="700" rows="3" placeholder="Descreva o que precisa ser observado."></textarea>
+      </label>
+      <button class="button button-primary" type="submit">Enviar relato</button>
+      <p id="report-feedback" class="feedback" role="status"></p>
       <p class="small-note">O relato será encaminhado à equipe Acessa+ para análise. Este formulário não é um canal oficial de emergência ou atendimento da Prefeitura.</p>
     </form>
   </section>
@@ -161,14 +184,8 @@
   <section class="modal-panel admin-panel" role="dialog" aria-modal="true" aria-labelledby="admin-title">
     <button class="modal-close" data-close="admin" aria-label="Fechar" type="button">×</button>
     <div id="admin-content">
-      <span class="eyebrow blue">ACESSO RESTRITO</span><h2 id="admin-title">Área da equipe</h2>
-      <p>Entre com a conta autorizada pela administração do Acessa+.</p>
-      <form id="login-form" class="form-card compact">
-        <label>E-mail<input id="login-email" type="email" autocomplete="username" required></label>
-        <label>Senha<input id="login-password" type="password" autocomplete="current-password" required></label>
-        <button class="button button-primary" type="submit">Entrar</button>
-        <p id="login-feedback" class="feedback" role="status"></p>
-      </form>
+      <span class="eyebrow blue">ACESSO RESTRITO</span>
+      <h2 id="admin-title">Área da equipe</h2>
     </div>
   </section>
 </div>
@@ -180,14 +197,6 @@
     <div id="account-content">
       <span class="eyebrow blue">ACESSA+</span>
       <h2 id="account-title">Minha conta</h2>
-      <p>Entre para avaliar os locais e compartilhar sua experiência.</p>
-      <form id="account-login-form" class="form-card compact">
-        <label>E-mail<input id="account-email" type="email" autocomplete="email" required></label>
-        <label>Senha<input id="account-password" type="password" autocomplete="current-password" required></label>
-        <button class="button button-primary" type="submit">Entrar</button>
-      </form>
-      <p id="account-feedback" class="feedback" role="status"></p>
-      <button class="button button-ghost account-switch" id="show-signup" type="button">Criar minha conta</button>
     </div>
   </section>
 </div>

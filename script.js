@@ -307,6 +307,51 @@ function openAccount() {
   showModal('account-modal');
   renderAccount();
 }
+/* Exibe avisos públicos */
+async function renderPublicAlerts() {
+  showModal('alerts-modal');
+
+  const list = $('#public-alerts-list');
+  list.replaceChildren(el('div','loading','Carregando avisos…'));
+
+  const {data,error} = await db
+    .from('alerts')
+    .select('*')
+    .eq('published',true)
+    .order('created_at',{ascending:false});
+
+  if (error) {
+    list.replaceChildren(el('div','empty','Não foi possível carregar os avisos.'));
+    console.error(error);
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data?.length) {
+    list.append(el('div','empty','Nenhum aviso publicado no momento.'));
+    return;
+  }
+
+  data.forEach(item => {
+    const card = el('article','admin-item');
+    const category = el('span','eyebrow blue',item.category);
+    const title = el('h3','',item.title);
+    const description = el('p','',item.description);
+    const date = el('p','small-note',
+      new Date(item.created_at).toLocaleDateString('pt-BR')
+    );
+
+    card.append(category,title,description);
+
+    if (item.location) {
+      card.append(el('p','small-note','Local: ' + item.location));
+    }
+
+    card.append(date);
+    list.append(card);
+  });
+}
 function renderAccount() {
   const root = $('#account-content');
   root.replaceChildren();
@@ -933,7 +978,7 @@ function init() {
   });
   document.addEventListener('keydown',event => {
     if (event.key === 'Escape') {
-      hideModal('place-modal'); hideModal('admin-modal'); hideModal('account-modal');
+      hideModal('place-modal'); hideModal('admin-modal'); hideModal('account-modal');hideModal('alerts-modal');
     }
   });
 

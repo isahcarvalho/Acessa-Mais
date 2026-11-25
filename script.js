@@ -8,6 +8,13 @@ const FEATURES = {
 };
 const STATUSES = ['Confirmado', 'Não disponível', 'Não informado', 'Em verificação'];
 const STATUS_CLASS = {'Confirmado':'confirmado','Não disponível':'nao-disponivel','Não informado':'nao-informado','Em verificação':'em-verificacao'};
+const SUGGESTION_TYPES = {
+  add_feature: 'Adicionar um recurso de acessibilidade',
+  correct_info: 'Corrigir uma informação do local',
+  update_contact: 'Atualizar endereço ou contato',
+  new_place: 'Sugerir um novo local',
+  other: 'Outra sugestão'
+};
 const CONFIG = window.ACESSA_CONFIG || {};
 const configured = CONFIG.supabaseUrl && CONFIG.supabaseAnonKey && !CONFIG.supabaseUrl.includes('COLE_AQUI') && !CONFIG.supabaseAnonKey.includes('COLE_AQUI');
 const db = configured && window.supabase ? window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey) : null;
@@ -253,26 +260,77 @@ async function loadPlaces() {
   renderPlaces();
 }
 
+function updateSuggestionFields() {
+  const type = $('#suggest-type').value;
+  const isFeature = type === 'add_feature';
+
+  $('#suggest-place-label').hidden = type === 'new_place';
+  $('#suggest-feature-label').hidden = !isFeature;
+  $('#suggest-status-label').hidden = !isFeature;
+
+  $('#suggest-place').required = [
+    'add_feature',
+    'correct_info',
+    'update_contact'
+  ].includes(type);
+
+  $('#suggest-feature').required = isFeature;
+  $('#suggest-status').required = isFeature;
+}
 async function submitSuggestion(event) {
   event.preventDefault();
   if (!db) return;
+
+  const type = $('#suggest-type').value;
+  const placeId = $('#suggest-place').value || null;
+  const feature = $('#suggest-feature').value || null;
+  const status = $('#suggest-status').value || null;
+  const note = $('#suggest-note').value.trim();
+
+  if (!SUGGESTION_TYPES[type] || note.length < 8) {
+    toast('Confira os campos da sugestão.');
+    return;
+  }
+
+  if (['add_feature', 'correct_info', 'update_contact'].includes(type) && !placeId) {
+    toast('Selecione o local.');
+    return;
+  }
+
+  if (type === 'add_feature' &&
+      (!feature || !STATUSES.includes(status))) {
+    toast('Selecione o recurso e a informação sugerida.');
+    return;
+  }
+
   const payload = {
-    place_id: $('#suggest-place').value,
-    feature_key: $('#suggest-feature').value,
-    suggested_status: $('#suggest-status').value,
-    note: $('#suggest-note').value.trim(),
+    suggestion_type: type,
+    place_id: placeId,
+    feature_key: type === 'add_feature' ? feature : null,
+    suggested_status: type === 'add_feature' ? status : null,
+    note,
     contact: $('#suggest-contact').value.trim() || null
   };
-  if (!payload.place_id || !payload.feature_key || !STATUSES.includes(payload.suggested_status) || payload.note.length < 8) {
-    toast('Confira os campos da sugestão.'); return;
-  }
-  const button = $('#suggestion-form button');
+
+  const button = $('#suggestion-form button[type="submit"]');
   button.disabled = true;
-  const {error} = await db.from('suggestions').insert(payload);
+
+  const { error } = await db.from('suggestions').insert(payload);
+
   button.disabled = false;
-  if (error) { console.error(error); toast('Não foi possível enviar. Tente novamente mais tarde.'); return; }
+
+  if (error) {
+    console.error(error);
+    toast('Não foi possível enviar. Tente novamente mais tarde.');
+    return;
+  }
+
   event.target.reset();
-  $('#suggest-feedback').textContent = 'Sugestão enviada! Ela ficará aguardando análise da equipe.';
+  updateSuggestionFields();
+
+  $('#suggest-feedback').textContent =
+    'Sugestão enviada! Ela ficará aguardando análise da equipe.';
+
   toast('Sugestão enviada para análise.');
 }
 
@@ -613,20 +671,44 @@ async function loadAdminTab(root) {
   if (table === 'places') data.forEach(item => root.append(placeAdminCard(item)));
 }
 function suggestionAdminCard(item) {
-  const card = el('article','admin-item');
+  const card = el('article', 'admin-item');
+
   const place = places.find(p => p.id === item.place_id);
-  card.append(el('h3','',place?.name || 'Local'));
-  card.append(el('p','',`${FEATURES[item.feature_key] || item.feature_key}: ${item.suggested_status}`));
-  card.append(el('p','',item.note));
-  card.append(el('p','',`Contato: ${item.contact || 'Não informado'} • Situação: ${item.review_status}`));
-  if (item.review_status === 'Pendente') {
-    const actions = el('div','admin-actions');
-    const approve = el('button','button button-primary','Aprovar e publicar');
-    approve.type = 'button'; approve.addEventListener('click',() => approveSuggestion(item));
-    const reject = el('button','button button-danger','Rejeitar');
-    reject.type = 'button'; reject.addEventListener('click',() => updateSuggestionStatus(item.id,'Rejeitada'));
-    actions.append(approve,reject); card.append(actions);
+  const type = item.suggestion_type || 'add_feature';
+
+  card.append(el('h3', '', SUGGESTION_TYPES[type] || 'Sugestão'));
+  card.append(el('p', '', `Local: ${place?.name || (type === 'new_place' ? 'Novo local sugerido' : 'Não informado')}`));
+
+  if (type === 'add_feature') {
+    card.append(el('p', '', `${FEATURES[item.feature_key] || item.feature_key}: ${item.suggested_status}`));
   }
+
+  card.append(el('p', '', item.note));
+  card.append(el('p', '', `Contato: ${item.contact || 'Não informado'}`));
+  card.append(el('p', '', `Situação: ${item.review_status || 'Pendente'}`));
+
+  if (item.review_status === 'Pendente') {
+    const actions = el('div', 'admin-actions');
+
+    const approve = el(
+      'button',
+      'button button-primary',
+      type === 'add_feature' ? 'Aprovar e publicar' : 'Marcar como analisada'
+    );
+
+    approve.type = 'button';
+    approve.addEventListener('click', () => approveSuggestion(item));
+
+    const reject = el('button', 'button button-danger', 'Rejeitar');
+    reject.type = 'button';
+    reject.addEventListener('click', () =>
+      updateSuggestionStatus(item.id, 'Rejeitada')
+    );
+
+    actions.append(approve, reject);
+    card.append(actions);
+  }
+
   return card;
 }
 function reportAdminCard(item) {
@@ -671,15 +753,52 @@ function placeAdminCard(place) {
   return card;
 }
 async function approveSuggestion(item) {
-  const place = places.find(p => p.id === item.place_id);
-  if (!place) { toast('Local não encontrado.'); return; }
-  const accessibility = {...(place.accessibility || {}),[item.feature_key]:item.suggested_status};
-  const update = await db.from('places').update({accessibility,updated_at:new Date().toISOString()}).eq('id',place.id);
-  if (update.error) { toast('Não foi possível atualizar o local.'); return; }
-  const review = await db.from('suggestions').update({review_status:'Aprovada'}).eq('id',item.id);
-  if (review.error) { toast('O local foi atualizado, mas não foi possível atualizar o status da sugestão. Confira o painel.'); return; }
-  toast('Sugestão aprovada e informação publicada.');
-  await loadPlaces(); loadAdminTab($('#admin-list'));
+  const type = item.suggestion_type || 'add_feature';
+
+  if (type === 'add_feature') {
+    const place = places.find(p => p.id === item.place_id);
+
+    if (!place || !FEATURES[item.feature_key] ||
+        !STATUSES.includes(item.suggested_status)) {
+      toast('Não foi possível validar essa sugestão.');
+      return;
+    }
+
+    const accessibility = {
+      ...(place.accessibility || {}),
+      [item.feature_key]: item.suggested_status
+    };
+
+    const update = await db.from('places')
+      .update({
+        accessibility,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', place.id);
+
+    if (update.error) {
+      toast('Não foi possível atualizar o local.');
+      return;
+    }
+  }
+
+  const review = await db.from('suggestions')
+    .update({ review_status: 'Aprovada' })
+    .eq('id', item.id);
+
+  if (review.error) {
+    toast('Não foi possível atualizar a situação da sugestão.');
+    return;
+  }
+
+  toast(
+    type === 'add_feature'
+      ? 'Sugestão aprovada e informação publicada!'
+      : 'Sugestão analisada e aprovada!'
+  );
+
+  await loadPlaces();
+  loadAdminTab($('#admin-list'));
 }
 async function updateSuggestionStatus(id,status) {
   const {error} = await db.from('suggestions').update({review_status:status}).eq('id',id);
@@ -710,6 +829,8 @@ function init() {
   $('#voice-btn').addEventListener('click',toggleVoiceSearch);
   setupVoiceSearch();
   $('#suggestion-form').addEventListener('submit',submitSuggestion);
+  $('#suggest-type').addEventListener('change', updateSuggestionFields);
+updateSuggestionFields();
   $('#report-form').addEventListener('submit',submitReport);
   $('#admin-open').addEventListener('click',openAdmin);
   $('#account-open').addEventListener('click',openAccount);

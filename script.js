@@ -815,13 +815,26 @@ function init() {
     }
   });
 
-  db.auth.onAuthStateChange((_event,session) => {
-    currentUser = session?.user || null;
-    if (!session) currentAdmin = null;
-    if (!$('#account-modal').hidden) renderAccount();
-  });
+db.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
 
-  loadPlaces();
-}
+  if (!session) {
+    currentAdmin = null;
+  }
+
+  const accountButton = $('#account-open');
+
+  if (accountButton) {
+    accountButton.textContent = currentUser
+      ? 'Minha conta'
+      : 'Entrar / Cadastrar';
+  }
+
+  setTimeout(() => {
+    if (!$('#account-modal').hidden) {
+      renderAccount();
+    }
+  }, 0);
+});
 
 document.addEventListener('DOMContentLoaded',init);

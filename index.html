@@ -15,36 +15,42 @@
 <header class="topbar">
   <a class="brand" href="#inicio" aria-label="Acessa+ início">
     <span class="brand-mark">A+</span>
-    <span>Acessa<span class="brand-plus">+</span><small>ACESSIBILIDADE E MOBILIDADE</small></span>
+    <span>Acessa<span class="brand-plus">+</span></span>
   </a>
   <div class="topbar-actions">
-    <button id="account-open" class="button button-ghost" type="button">Minha conta</button>
-    <button id="admin-open" class="button button-ghost" type="button">Área da equipe</button>
+    <button id="account-open" class="account-open" type="button" aria-label="Entrar ou cadastrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.8 20c.7-3.5 3.2-5.3 7.2-5.3s6.5 1.8 7.2 5.3"></path></svg>
+      <span>Entrar / Cadastrar</span>
+    </button>
   </div>
 </header>
 
-<main>
-  <section id="inicio" class="hero">
-    <div class="hero-copy">
-      <span class="eyebrow">MARINGÁ • PARANÁ</span>
-      <h1>A cidade mais acessível começa com <em>informação.</em></h1>
-      <p>Consulte recursos de acessibilidade dos espaços da cidade e compartilhe informações para ajudar outras pessoas.</p>
-      <a class="button button-light" href="#lugares">Explorar locais <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="hero-circle"><span>ACESSO</span><strong>PARA<br>TODOS</strong><small>INFORMAÇÃO • AUTONOMIA • INCLUSÃO</small></div>
-    </div>
+<main id="inicio">
+  <section class="home-intro" aria-labelledby="home-title">
+    <span class="eyebrow blue">MARINGÁ • PARANÁ</span>
+    <h1 id="home-title">Encontre lugares com mais <em>autonomia.</em></h1>
+    <p>Consulte informações de acessibilidade e descubra espaços da cidade com mais facilidade.</p>
   </section>
 
-  <section class="section" id="lugares">
-    <div class="section-heading">
-      <div><span class="eyebrow blue">EXPLORE A CIDADE</span><h2>Encontre um lugar</h2><p>Veja endereço, contato e informações de acessibilidade.</p></div>
-      <span class="section-icon" aria-hidden="true">⌕</span>
+  <section class="section places-section" id="lugares" aria-labelledby="places-title">
+    <div class="search-area">
+      <div class="search-row">
+        <div class="search-box">
+          <svg class="search-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+          <input id="search" type="search" placeholder="O que você está procurando?" aria-label="Buscar locais por nome, categoria ou endereço">
+          <button id="voice-btn" class="voice-inside" type="button" aria-label="Pesquisar por voz" title="Pesquisar por voz">🎤</button>
+        </div>
+        <select id="category-filter" class="visually-hidden" aria-label="Filtrar categoria"><option value="">Todas as categorias</option></select>
+      </div>
+      <div class="category-area">
+        <span class="category-caption">Explore por categoria</span>
+        <div id="category-chips" class="category-chips" aria-label="Categorias de locais">
+          <button class="category-chip active" type="button" data-category="" aria-pressed="true">Todos</button>
+        </div>
+      </div>
     </div>
-    <div class="search-row">
-      <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Buscar por nome, categoria ou endereço" aria-label="Buscar locais"></label>
-      <button id="voice-btn" class="button button-primary" type="button" aria-label="Pesquisar por voz" title="Pesquisar por voz">🎤</button>
-      <select id="category-filter" aria-label="Filtrar categoria"><option value="">Todas as categorias</option></select>
+    <div class="section-heading places-heading">
+      <div><span class="eyebrow blue">DESCUBRA MARINGÁ</span><h2 id="places-title">Locais para conhecer</h2><p>Veja fotos, endereços e informações de acessibilidade.</p></div>
     </div>
     <div id="places-grid" class="places-grid"><div class="loading">Carregando locais…</div></div>
   </section>
@@ -87,6 +93,7 @@
   <div class="footer-brand"><span class="brand-mark">A+</span><b>Acessa+</b></div>
   <p>Informação acessível para uma cidade mais inclusiva.</p>
   <small>Projeto em desenvolvimento • Maringá–PR</small>
+  <button id="admin-open" class="footer-team-link" type="button">Acesso da equipe</button>
 </footer>
 
 <div id="place-modal" class="modal" hidden>

@@ -636,7 +636,7 @@ function renderAdmin() {
   });
   root.append(logout);
   const tabs = el('div','admin-tabs');
-  [['suggestions','Sugestões'],['reports','Relatos'],['places','Locais']].forEach(([key,label]) => {
+ [['suggestions','Sugestões'],['reports','Relatos'],['places','Locais'],['alerts','Avisos']].forEach(([key,label]) => {
     const b = el('button',adminTab === key ? 'active' : '',label);
     b.type = 'button';
     b.addEventListener('click',() => { adminTab = key; renderAdmin(); });

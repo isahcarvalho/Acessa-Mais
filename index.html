@@ -18,6 +18,36 @@
     <span>Acessa<span class="brand-plus">+</span></span>
   </a>
   <div class="topbar-actions">
+  <nav class="quick-nav" aria-label="Atalhos principais">
+    <button class="quick-link" type="button" data-shortcut="transporte">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="3" width="16" height="16" rx="3"/>
+        <path d="M4 10h16M8 19l-2 2m10-2 2 2M8 15h.01M16 15h.01"/>
+      </svg>
+      <span>Ônibus</span>
+    </button>
+
+    <button class="quick-link" type="button" data-shortcut="rotas">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/>
+        <circle cx="12" cy="10" r="2.5"/>
+      </svg>
+      <span>Rotas</span>
+    </button>
+
+    <button class="quick-link" type="button" data-shortcut="avisos">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+        <path d="M10 21h4"/>
+      </svg>
+      <span>Avisos</span>
+    </button>
+  </nav>
+
+  <button id="account-open" class="account-open" type="button" aria-label="Entrar ou cadastrar">
+    <span>Entrar / Cadastrar</span>
+  </button>
+  </div>
     <button id="account-open" class="account-open" type="button" aria-label="Entrar ou cadastrar">
       <span>Entrar / Cadastrar</span>
     </button>
@@ -31,8 +61,6 @@
     <p>Consulte informações de acessibilidade e descubra espaços da cidade com mais facilidade.</p>
   </section>
 
-  
-  <section class="section soft-section" id="transporte">
     <div class="section-heading">
       <div>
         <span class="eyebrow blue">MOBILIDADE URBANA</span>

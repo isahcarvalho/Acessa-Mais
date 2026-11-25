@@ -1,3 +1,4 @@
+
 'use strict';
 
 const FEATURES = {
@@ -11,13 +12,83 @@ const STATUS_CLASS = {'Confirmado':'confirmado','Não disponível':'nao-disponiv
 const CONFIG = window.ACESSA_CONFIG || {};
 const configured = CONFIG.supabaseUrl && CONFIG.supabaseAnonKey && !CONFIG.supabaseUrl.includes('COLE_AQUI') && !CONFIG.supabaseAnonKey.includes('COLE_AQUI');
 const db = configured && window.supabase ? window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey) : null;
+
 let places = [];
 let currentAdmin = null;
 let adminTab = 'suggestions';
+
+// PESQUISA POR VOZ
+let recognition = null;
+let isListening = false;
+
 const $ = (selector, root=document) => root.querySelector(selector);
 const el = (tag, className='', text='') => { const node=document.createElement(tag); if(className) node.className=className; if(text!==undefined && text!=='') node.textContent=String(text); return node; };
 
 function toast(message){const node=$('#toast');node.textContent=message;node.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>node.classList.remove('show'),3500);}
+
+// CONFIGURAÇÃO DO MICROFONE
+function setupVoiceSearch(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+    recognition = null;
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'pt-BR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    $('#search').value = transcript;
+    renderPlaces();
+    toast('Pesquisa por voz realizada!');
+  };
+
+  recognition.onerror = (event) => {
+    isListening = false;
+    $('#voice-btn').classList.remove('listening');
+
+    if(event.error === 'not-allowed' || event.error === 'service-not-allowed'){
+      toast('Permita o acesso ao microfone nas configurações do navegador.');
+    } else {
+      toast('Não foi possível reconhecer a voz. Tente novamente.');
+    }
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    $('#voice-btn').classList.remove('listening');
+    $('#voice-btn').setAttribute('aria-label', 'Pesquisar por voz');
+  };
+}
+
+function toggleVoiceSearch(){
+  if(!recognition){
+    toast('A pesquisa por voz não está disponível neste navegador.');
+    return;
+  }
+
+  if(isListening){
+    recognition.stop();
+    return;
+  }
+
+  try{
+    isListening = true;
+    $('#voice-btn').classList.add('listening');
+    $('#voice-btn').setAttribute('aria-label', 'Parar pesquisa por voz');
+    recognition.start();
+    toast('Pode falar o nome do local que deseja encontrar.');
+  }catch(error){
+    isListening = false;
+    $('#voice-btn').classList.remove('listening');
+    toast('Não foi possível iniciar o microfone. Tente novamente.');
+  }
+}
+
 function statusPill(status){const pill=el('span','status-pill status-'+(STATUS_CLASS[status]||'nao-informado'),status||'Não informado');return pill;}
 function showModal(id){$('#'+id).hidden=false;document.body.style.overflow='hidden';}
 function hideModal(id){$('#'+id).hidden=true;document.body.style.overflow='';}
@@ -40,6 +111,55 @@ function reportAdminCard(item){const card=el('article','admin-item');card.append
 function placeAdminCard(place){const card=el('article','admin-item');card.append(el('h3','',place.name));card.append(el('p','',place.address||'Endereço não informado'));const grid=el('div','');Object.entries(FEATURES).forEach(([key,label])=>{const wrap=el('label','',label);const select=el('select');STATUSES.forEach(s=>select.add(new Option(s,s)));select.value=(place.accessibility||{})[key]||'Não informado';select.dataset.feature=key;wrap.append(select);grid.append(wrap);});const save=el('button','button button-primary','Salvar recursos');save.type='button';save.addEventListener('click',async()=>{const accessibility={...(place.accessibility||{})};grid.querySelectorAll('select').forEach(s=>accessibility[s.dataset.feature]=s.value);const {error}=await db.from('places').update({accessibility,updated_at:new Date().toISOString()}).eq('id',place.id);if(error){toast('Não foi possível salvar.');return;}toast('Informações atualizadas para todos os usuários.');await loadPlaces();loadAdminTab($('#admin-list'));});card.append(grid,save);return card;}
 async function approveSuggestion(item){const place=places.find(p=>p.id===item.place_id);if(!place){toast('Local não encontrado.');return;}const accessibility={...(place.accessibility||{}),[item.feature_key]:item.suggested_status};const update=await db.from('places').update({accessibility,updated_at:new Date().toISOString()}).eq('id',place.id);if(update.error){toast('Não foi possível atualizar o local.');return;}const review=await db.from('suggestions').update({review_status:'Aprovada'}).eq('id',item.id);if(review.error){toast('O local foi atualizado, mas não foi possível atualizar o status da sugestão. Confira o painel.');return;}toast('Sugestão aprovada e informação publicada.');await loadPlaces();loadAdminTab($('#admin-list'));}
 async function updateSuggestionStatus(id,status){const {error}=await db.from('suggestions').update({review_status:status}).eq('id',id);if(error){toast('Não foi possível atualizar a sugestão.');return;}toast('Sugestão atualizada.');loadAdminTab($('#admin-list'));}
-function closeByBackdrop(event){const close=event.target.closest('[data-close]');if(close)hideModal(close.dataset.close==='place'?'place-modal':'admin-modal');}
-function init(){document.addEventListener('click',event=>{const close=event.target.closest('[data-close]');if(close)hideModal(close.dataset.close==='place'?'place-modal':'admin-modal');});document.addEventListener('keydown',event=>{if(event.key==='Escape'){hideModal('place-modal');hideModal('admin-modal');}});$('#search').addEventListener('input',renderPlaces);$('#category-filter').addEventListener('change',renderPlaces);$('#suggestion-form').addEventListener('submit',submitSuggestion);$('#report-form').addEventListener('submit',submitReport);$('#admin-open').addEventListener('click',openAdmin);$('#login-form').addEventListener('submit',login);if(!db){configWarning();return;}renderLogin();db.auth.getSession().then(({data})=>{if(data.session){currentAdmin=data.session.user;verifyAdmin();}});db.auth.onAuthStateChange((_event,session)=>{if(session){currentAdmin=session.user;}else{currentAdmin=null;}});loadPlaces();}
+
+function init(){
+  document.addEventListener('click',event=>{
+    const close=event.target.closest('[data-close]');
+    if(close)hideModal(close.dataset.close==='place'?'place-modal':'admin-modal');
+  });
+
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){
+      hideModal('place-modal');
+      hideModal('admin-modal');
+    }
+  });
+
+  $('#search').addEventListener('input',renderPlaces);
+  $('#category-filter').addEventListener('change',renderPlaces);
+  $('#voice-btn').addEventListener('click',toggleVoiceSearch);
+
+  // Prepara o reconhecimento de voz
+  setupVoiceSearch();
+
+  $('#suggestion-form').addEventListener('submit',submitSuggestion);
+  $('#report-form').addEventListener('submit',submitReport);
+  $('#admin-open').addEventListener('click',openAdmin);
+  $('#login-form').addEventListener('submit',login);
+
+  if(!db){
+    configWarning();
+    return;
+  }
+
+  renderLogin();
+
+  db.auth.getSession().then(({data})=>{
+    if(data.session){
+      currentAdmin=data.session.user;
+      verifyAdmin();
+    }
+  });
+
+  db.auth.onAuthStateChange((_event,session)=>{
+    if(session){
+      currentAdmin=session.user;
+    }else{
+      currentAdmin=null;
+    }
+  });
+
+  loadPlaces();
+}
+
 document.addEventListener('DOMContentLoaded',init);

@@ -127,3 +127,39 @@ insert into public.places (slug,name,category,address,phone,description,source_u
 ('parque-do-inga','Parque do Ingá','Lazer e natureza','Av. São Paulo, Zona 1, Maringá–PR',null,'Parque urbano. Consultar a administração para condições atuais de circulação e visitação.','https://www.google.com/maps/search/?api=1&query=Parque+do+Inga+Maringa', '{"ramp":"Não informado","step_free":"Não informado","restroom":"Não informado","elevator":"Não informado","tactile":"Não informado","braille":"Não informado","audio":"Não informado","libras":"Não informado","visual":"Não informado","simple_language":"Não informado"}'),
 ('parque-do-japao','Parque do Japão','Lazer e cultura','Rua Tulipa, 987, Jardim Industrial, Maringá–PR',null,'Espaço de lazer e cultura. Confirmar horários e condições de acessibilidade com a administração.','https://www.google.com/maps/search/?api=1&query=Parque+do+Japao+Maringa', '{"ramp":"Não informado","step_free":"Não informado","restroom":"Não informado","elevator":"Não informado","tactile":"Não informado","braille":"Não informado","audio":"Não informado","libras":"Não informado","visual":"Não informado","simple_language":"Não informado"}')
 on conflict (slug) do nothing;
+-- =========================
+-- AVISOS DE ACESSIBILIDADE
+-- =========================
+
+create table if not exists public.alerts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  category text not null check (
+    category in ('Obras','Manutenção','Novidade')
+  ),
+  description text not null,
+  location text,
+  published boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.alerts enable row level security;
+
+drop policy if exists "Public can read published alerts" on public.alerts;
+drop policy if exists "Admins manage alerts" on public.alerts;
+
+create policy "Public can read published alerts"
+on public.alerts
+for select
+to anon, authenticated
+using (published = true);
+
+create policy "Admins manage alerts"
+on public.alerts
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+grant select on public.alerts to anon, authenticated;
+grant insert, update, delete on public.alerts to authenticated;

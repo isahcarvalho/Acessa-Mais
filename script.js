@@ -839,5 +839,30 @@ db.auth.onAuthStateChange((_event, session) => {
     }
   }, 0);
 });
+    document.querySelectorAll('[data-shortcut]').forEach(button => {
+    button.addEventListener('click', () => {
+      const shortcut = button.dataset.shortcut;
+
+      if (shortcut === 'transporte') {
+        window.open(
+          'https://www.nahoramaringa.com.br/',
+          '_blank',
+          'noopener,noreferrer'
+        );
+      }
+
+      if (shortcut === 'rotas') {
+        window.open(
+          'https://www.google.com/maps/dir/',
+          '_blank',
+          'noopener,noreferrer'
+        );
+      }
+
+      if (shortcut === 'avisos') {
+        alert('Em breve: avisos sobre obras, manutenção e novidades de acessibilidade.');
+      }
+    });
+  });
 }
 document.addEventListener('DOMContentLoaded',init);

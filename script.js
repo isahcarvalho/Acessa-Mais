@@ -671,17 +671,64 @@ function renderLogin() {
 
 async function loadAdminTab(root) {
   root.replaceChildren(el('div','loading','Carregando painel…'));
+
   const table = adminTab;
-  let query = db.from(table).select('*').order('created_at',{ascending:false}).limit(100);
-  if (table === 'places') query = db.from('places').select('*').order('name');
+  let query = db.from(table)
+    .select('*')
+    .order('created_at',{ascending:false})
+    .limit(100);
+
+  if (table === 'places') {
+    query = db.from('places').select('*').order('name');
+  }
+
   const {data,error} = await query;
-  if (error) { root.replaceChildren(el('div','empty','Não foi possível carregar esta lista.')); console.error(error); return; }
+
+  if (error) {
+    root.replaceChildren(el('div','empty','Não foi possível carregar esta lista.'));
+    console.error(error);
+    return;
+  }
+
   root.replaceChildren();
-  if (!data?.length) { root.append(el('div','empty','Nenhum registro por aqui.')); return; }
-  if (table === 'suggestions') data.forEach(item => root.append(suggestionAdminCard(item)));
-  if (table === 'reports') data.forEach(item => root.append(reportAdminCard(item)));
-  if (table === 'places') data.forEach(item => root.append(placeAdminCard(item)));
+
+  if (!data?.length) {
+    root.append(el('div','empty',
+      table === 'alerts'
+        ? 'Nenhum aviso cadastrado ainda.'
+        : 'Nenhum registro por aqui.'
+    ));
+    return;
+  }
+
+  if (table === 'suggestions') {
+    data.forEach(item => root.append(suggestionAdminCard(item)));
+  }
+
+  if (table === 'reports') {
+    data.forEach(item => root.append(reportAdminCard(item)));
+  }
+
+  if (table === 'places') {
+    data.forEach(item => root.append(placeAdminCard(item)));
+  }
+
+  if (table === 'alerts') {
+    data.forEach(item => {
+      const card = el('article','admin-card');
+      card.append(el('strong','',item.title));
+      card.append(el('span','',item.category));
+      card.append(el('p','',item.description));
+
+      if (item.location) {
+        card.append(el('p','small-note','Local: ' + item.location));
+      }
+
+      root.append(card);
+    });
+  }
 }
+
 function suggestionAdminCard(item) {
   const card = el('article','admin-item');
   const place = places.find(p => p.id === item.place_id);

@@ -840,6 +840,7 @@ db.auth.onAuthStateChange((_event, session) => {
   }, 0);
 });
     document.querySelectorAll('[data-shortcut]').forEach(button => {
+      console.log('Atalhos encontrados:', document.querySelectorAll('[data-shortcut]').length);
     button.addEventListener('click', () => {
       const shortcut = button.dataset.shortcut;
 

@@ -712,20 +712,8 @@ async function loadAdminTab(root) {
   if (table === 'places') {
     data.forEach(item => root.append(placeAdminCard(item)));
   }
-
   if (table === 'alerts') {
-    data.forEach(item => {
-      const card = el('article','admin-card');
-      card.append(el('strong','',item.title));
-      card.append(el('span','',item.category));
-      card.append(el('p','',item.description));
-
-      if (item.location) {
-        card.append(el('p','small-note','Local: ' + item.location));
-      }
-
-      root.append(card);
-    });
+  data.forEach(item => root.append(alertAdminCard(item)));
   }
 }
 
@@ -803,6 +791,74 @@ function placeAdminCard(place) {
   card.append(grid,save);
   return card;
 }
+
+function alertAdminCard(item) {
+  const card = el('article','admin-item');
+
+  const title = el('input');
+  title.value = item.title;
+  title.placeholder = 'Título do aviso';
+
+  const category = el('select');
+  ['Obras','Manutenção','Novidade'].forEach(value => {
+    category.add(new Option(value,value));
+  });
+  category.value = item.category;
+
+  const description = el('textarea');
+  description.value = item.description;
+  description.placeholder = 'Descrição do aviso';
+
+  const location = el('input');
+  location.value = item.location || '';
+  location.placeholder = 'Local (opcional)';
+
+  const save = el('button','button button-primary','Salvar alterações');
+  save.type = 'button';
+
+  save.addEventListener('click',async () => {
+    const {error} = await db.from('alerts').update({
+      title: title.value.trim(),
+      category: category.value,
+      description: description.value.trim(),
+      location: location.value.trim()
+    }).eq('id',item.id);
+
+    if (error) {
+      toast('Não foi possível atualizar o aviso.');
+      console.error(error);
+      return;
+    }
+
+    toast('Aviso atualizado!');
+    loadAdminTab($('#admin-list'));
+  });
+
+  const remove = el('button','button button-ghost','Excluir aviso');
+  remove.type = 'button';
+
+  remove.addEventListener('click',async () => {
+    if (!confirm('Deseja excluir este aviso?')) return;
+
+    const {error} = await db.from('alerts')
+      .delete()
+      .eq('id',item.id);
+
+    if (error) {
+      toast('Não foi possível excluir o aviso.');
+      console.error(error);
+      return;
+    }
+
+    toast('Aviso excluído!');
+    loadAdminTab($('#admin-list'));
+  });
+
+  card.append(title,category,description,location,save,remove);
+
+  return card;
+}
+
 async function approveSuggestion(item) {
   const place = places.find(p => p.id === item.place_id);
   if (!place) { toast('Local não encontrado.'); return; }

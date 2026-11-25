@@ -277,9 +277,16 @@ function updateSuggestionFields() {
   $('#suggest-feature').required = isFeature;
   $('#suggest-status').required = isFeature;
 }
+
 async function submitSuggestion(event) {
   event.preventDefault();
   if (!db) return;
+
+  if (!currentUser) {
+    toast('Entre na sua conta para enviar uma sugestão.');
+    openAccount();
+    return;
+  }
 
   const type = $('#suggest-type').value;
   const placeId = $('#suggest-place').value || null;
@@ -304,6 +311,7 @@ async function submitSuggestion(event) {
   }
 
   const payload = {
+    user_id: currentUser.id,
     suggestion_type: type,
     place_id: placeId,
     feature_key: type === 'add_feature' ? feature : null,
@@ -329,37 +337,58 @@ async function submitSuggestion(event) {
   updateSuggestionFields();
 
   $('#suggest-feedback').textContent =
-    'Sugestão enviada! Ela ficará aguardando análise da equipe.';
+    'Sugestão enviada! Você poderá acompanhar o andamento em Minhas contribuições.';
 
   toast('Sugestão enviada para análise.');
 }
 
+
+
 async function submitReport(event) {
   event.preventDefault();
   if (!db) return;
+
+  if (!currentUser) {
+    toast('Entre na sua conta para enviar um relato.');
+    openAccount();
+    return;
+  }
+
   const payload = {
+    user_id: currentUser.id,
     problem_type: $('#report-type').value,
     location_text: $('#report-location').value.trim(),
     description: $('#report-description').value.trim()
   };
-  if (!payload.problem_type || payload.location_text.length < 5 || payload.description.length < 10) {
-    toast('Confira os campos do relato.'); return;
+
+  if (!payload.problem_type ||
+      payload.location_text.length < 5 ||
+      payload.description.length < 10) {
+    toast('Confira os campos do relato.');
+    return;
   }
+
   const button = $('#report-form button');
   button.disabled = true;
-  const {error} = await db.from('reports').insert(payload);
+
+  const { error } = await db.from('reports').insert(payload);
+
   button.disabled = false;
-  if (error) { console.error(error); toast('Não foi possível enviar o relato.'); return; }
+
+  if (error) {
+    console.error(error);
+    toast('Não foi possível enviar o relato.');
+    return;
+  }
+
   event.target.reset();
-  $('#report-feedback').textContent = 'Relato recebido pela equipe Acessa+. Obrigado por contribuir.';
+
+  $('#report-feedback').textContent =
+    'Relato recebido! Você poderá acompanhar o andamento em Minhas contribuições.';
+
   toast('Relato enviado.');
 }
 
-/* Cadastro e login de usuários comuns */
-function openAccount() {
-  showModal('account-modal');
-  renderAccount();
-}
 function renderAccount() {
   const root = $('#account-content');
   root.replaceChildren();

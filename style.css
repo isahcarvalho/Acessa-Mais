@@ -35,16 +35,13 @@ footer{background:#102f50;color:#d9e7f2;padding:35px max(7vw,22px);text-align:ce
 .footer-team-link{display:block;margin:17px auto 0;border:0;background:transparent;color:#a9bfd1;font-size:11px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:7px}.footer-team-link:hover{color:#fff}
 @media(max-width:900px){.places-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.topbar{min-height:64px;padding:8px 14px}.brand{font-size:22px}.brand-mark{width:39px;height:39px}.account-open{min-height:42px;padding:8px 12px;font-size:12px}.home-intro{padding:42px 18px 17px}.home-intro h1{font-size:36px}.home-intro p{font-size:14px}.places-section{padding-top:18px}.search-area{margin-bottom:32px}.search-box{min-height:62px;padding:0 11px 0 14px;border-radius:15px}.search-box input{font-size:15px}.voice-inside{width:40px;height:40px;flex-basis:40px}.category-chips{gap:7px}.category-chip{padding:9px 14px;min-height:40px}.places-grid{grid-template-columns:1fr}.place-photo{height:190px}.places-heading{margin-bottom:18px}}
-  .place-photo-image,
-.photo-placeholder {
-  display: none !important;
-}
-.photo-wrap {
-  display: none !important;
-}
-
 .place-photo {
   display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
 
 .place-card {

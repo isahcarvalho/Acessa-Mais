@@ -39,3 +39,14 @@ footer{background:#102f50;color:#d9e7f2;padding:35px max(7vw,22px);text-align:ce
 .photo-placeholder {
   display: none !important;
 }
+.photo-wrap {
+  display: none !important;
+}
+
+.place-photo {
+  display: none !important;
+}
+
+.place-card {
+  grid-template-rows: auto !important;
+}

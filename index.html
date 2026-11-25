@@ -64,8 +64,6 @@
       <div class="legend-item"><i class="dot orange"></i><div><b>Em verificação</b><small>A informação está sendo conferida.</small></div></div>
     </div>
   </section>
-
-  <section class="section report-section" id="contribuir">
     <div class="report-copy"><span class="eyebrow blue">CONSTRUA COM A GENTE</span><h2>Encontrou uma informação diferente?</h2><p>Envie uma sugestão de atualização. Ela será analisada pela equipe antes de aparecer para todos.</p><p class="small-note">Sugestões não alteram automaticamente os dados públicos.</p></div>
     <form id="suggestion-form" class="form-card">
       <label>Local<select id="suggest-place" required><option value="">Selecione um local</option></select></label>
@@ -76,7 +74,61 @@
       <button class="button button-primary" type="submit">Enviar para análise</button><p id="suggest-feedback" class="feedback" role="status"></p>
     </form>
   </section>
+<section class="section report-section" id="contribuir">
+  <div class="report-copy">
+    <span class="eyebrow blue">CONSTRUA COM A GENTE</span>
+    <h2>Ajude a melhorar o Acessa+</h2>
+    <p>Envie sugestões para melhorar as informações e a acessibilidade dos locais.</p>
+    <p class="small-note">Todas as sugestões serão analisadas pela equipe antes de serem publicadas.</p>
+  </div>
 
+  <form id="suggestion-form" class="form-card">
+    <label>O que você deseja sugerir?
+      <select id="suggest-type" required>
+        <option value="">Selecione uma opção</option>
+        <option value="add_feature">Adicionar um recurso de acessibilidade</option>
+        <option value="correct_info">Corrigir uma informação do local</option>
+        <option value="update_contact">Atualizar endereço ou contato</option>
+        <option value="new_place">Sugerir um novo local</option>
+        <option value="other">Outra sugestão</option>
+      </select>
+    </label>
+
+    <label id="suggest-place-label">Local
+      <select id="suggest-place">
+        <option value="">Selecione um local, se aplicável</option>
+      </select>
+    </label>
+
+    <label id="suggest-feature-label">Recurso de acessibilidade
+      <select id="suggest-feature">
+        <option value="">Selecione um recurso, se aplicável</option>
+      </select>
+    </label>
+
+    <label id="suggest-status-label">Informação sugerida
+      <select id="suggest-status">
+        <option value="">Selecione, se aplicável</option>
+        <option>Confirmado</option>
+        <option>Não disponível</option>
+        <option>Em verificação</option>
+        <option>Não informado</option>
+      </select>
+    </label>
+
+    <label>Explique sua sugestão
+      <textarea id="suggest-note" rows="4" minlength="8" maxlength="700"
+        required placeholder="Conte o que você gostaria de sugerir ou corrigir."></textarea>
+    </label>
+
+    <label>Seu contato (opcional)
+      <input id="suggest-contact" maxlength="120" placeholder="E-mail ou outro contato">
+    </label>
+
+    <button class="button button-primary" type="submit">Enviar para análise</button>
+    <p id="suggest-feedback" class="feedback" role="status"></p>
+  </form>
+</section>
   <section class="section report-section issue-section">
     <div class="report-copy"><span class="eyebrow blue">MELHORIA DA CIDADE</span><h2>Relate uma barreira de acessibilidade</h2><p>Avise sobre calçada danificada, rampa bloqueada, elevador fora de serviço ou outro obstáculo.</p></div>
     <form id="report-form" class="form-card">

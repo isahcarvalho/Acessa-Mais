@@ -47,3 +47,84 @@ footer{background:#102f50;color:#d9e7f2;padding:35px max(7vw,22px);text-align:ce
 .place-card {
   grid-template-rows: auto !important;
 }
+
+/* Atalhos compactos do cabeçalho */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+}
+
+.quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 38px;
+  padding: 3px;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  cursor: pointer;
+  border-radius: 9px;
+}
+
+.quick-link svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.quick-link span {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.quick-link:hover {
+  background: var(--blue2);
+}
+
+@media(max-width:650px) {
+  .topbar-actions {
+    gap: 7px;
+  }
+
+  .quick-nav {
+    gap: 5px;
+  }
+
+  .quick-link {
+    min-width: 31px;
+    padding: 2px;
+  }
+
+  .quick-link svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .quick-link span {
+    font-size: 9px;
+  }
+
+  .account-open {
+    padding: 7px 9px;
+    min-height: 38px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+}
+
